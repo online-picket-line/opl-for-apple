@@ -120,9 +120,13 @@ struct DisputeAlertView: View {
                 }
                 .padding(.bottom, 30)
             }
-            .navigationBarItems(trailing: Button("Close") {
-                isPresented = false
-            })
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Close") {
+                        isPresented = false
+                    }
+                }
+            }
         }
     }
 }
