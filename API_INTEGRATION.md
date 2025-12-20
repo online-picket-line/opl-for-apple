@@ -4,7 +4,7 @@ This document provides examples of how to integrate with the Online Picket Line 
 
 ## API Endpoint Structure
 
-Based on the problem statement referencing `https://github.com/oplfun/online-picketline/blob/main/API_DOCUMENTATION.md`, the API should provide endpoints for querying labor dispute information.
+Based on the problem statement referencing `https://github.com/online-picket-line/online-picketline/blob/main/API_DOCUMENTATION.md`, the API should provide endpoints for querying labor dispute information.
 
 ## Expected API Response Format
 
@@ -403,7 +403,7 @@ func testEndToEndFetch() async throws {
 ## API Documentation Reference
 
 Once the Online Picket Line API documentation is available at:
-https://github.com/oplfun/online-picketline/blob/main/API_DOCUMENTATION.md
+https://github.com/online-picket-line/online-picketline/blob/main/API_DOCUMENTATION.md
 
 Review it for:
 - Authentication requirements

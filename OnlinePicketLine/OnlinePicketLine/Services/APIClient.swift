@@ -6,7 +6,7 @@ class APIClient {
     
     // API endpoint - using GitHub raw content as a placeholder
     // In production, this would point to the actual Online Picket Line API
-    private let baseURL = "https://raw.githubusercontent.com/oplfun/online-picketline/main"
+    private let baseURL = "https://raw.githubusercontent.com/online-picket-line/online-picketline/main"
     
     private init() {}
     

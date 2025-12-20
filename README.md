@@ -4,7 +4,7 @@ An iOS application that helps users support workers' rights by alerting them whe
 
 ## Overview
 
-This application monitors outgoing traffic and checks against the [Online Picket Line API](https://github.com/oplfun/online-picketline) to inform users when they're accessing a company currently under a labor dispute. When a match is found, the user is presented with information about the dispute and can choose to respect the picket line or proceed anyway.
+This application monitors outgoing traffic and checks against the [Online Picket Line API](https://github.com/online-picket-line/online-picketline) to inform users when they're accessing a company currently under a labor dispute. When a match is found, the user is presented with information about the dispute and can choose to respect the picket line or proceed anyway.
 
 ## Features
 
@@ -85,7 +85,7 @@ For a production implementation, consider:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/oplfun/opl-for-apple.git
+   git clone https://github.com/online-picket-line/opl-for-apple.git
    cd opl-for-apple
    ```
 

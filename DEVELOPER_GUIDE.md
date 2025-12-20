@@ -102,7 +102,7 @@ Configuration screen with:
 
 2. **Clone Repository**
    ```bash
-   git clone https://github.com/oplfun/opl-for-apple.git
+    git clone https://github.com/online-picket-line/opl-for-apple.git
    cd opl-for-apple
    ```
 

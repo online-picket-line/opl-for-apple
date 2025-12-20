@@ -67,7 +67,7 @@ All processing happens on your device.
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/oplfun/opl-for-apple.git
+   git clone https://github.com/online-picket-line/opl-for-apple.git
    cd opl-for-apple
    ```
 
@@ -173,7 +173,7 @@ A: Not yet. Additional work is needed for network interception and App Store com
 
 ### Getting Help
 
-- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/oplfun/opl-for-apple/issues)
+- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/online-picket-line/opl-for-apple/issues)
 - **Documentation**: Check the README and guides
 - **Discussions**: Join the conversation in GitHub Discussions
 
@@ -190,7 +190,7 @@ See `DEVELOPER_GUIDE.md` for coding standards and conventions.
 
 ## Resources
 
-- [Online Picket Line Project](https://github.com/oplfun/online-picketline)
+- [Online Picket Line Project](https://github.com/online-picket-line/online-picketline)
 - [Swift Documentation](https://docs.swift.org/)
 - [SwiftUI Tutorials](https://developer.apple.com/tutorials/swiftui)
 - [iOS Developer Documentation](https://developer.apple.com/documentation/)

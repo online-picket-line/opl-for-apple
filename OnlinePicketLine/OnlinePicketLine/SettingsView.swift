@@ -87,7 +87,7 @@ struct SettingsView: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    Link(destination: URL(string: "https://github.com/oplfun/online-picketline")!) {
+                    Link(destination: URL(string: "https://github.com/online-picket-line/online-picketline")!) {
                         HStack {
                             Text("Online Picket Line Project")
                             Spacer()
