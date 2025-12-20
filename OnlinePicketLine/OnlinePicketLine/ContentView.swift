@@ -10,30 +10,35 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
+                // Error Banner
+                if let errorMessage = disputeManager.errorMessage {
+                    ErrorBanner(message: errorMessage)
+                }
+
                 // Status Section
                 VStack(spacing: 10) {
                     Image(systemName: networkMonitor.isMonitoring ? "shield.checkered" : "shield.slash")
                         .font(.system(size: 60))
                         .foregroundColor(networkMonitor.isMonitoring ? .green : .gray)
-                    
+
                     Text(networkMonitor.isMonitoring ? "Protection Active" : "Protection Inactive")
                         .font(.title2)
                         .fontWeight(.bold)
-                    
+
                     Text("Monitoring outgoing traffic")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 .padding()
-                
+
                 Divider()
-                
+
                 // Statistics
                 VStack(alignment: .leading, spacing: 15) {
                     Text("Statistics")
                         .font(.headline)
                         .padding(.horizontal)
-                    
+
                     HStack {
                         StatCard(
                             title: "Companies Tracked",
@@ -48,15 +53,15 @@ struct ContentView: View {
                     }
                     .padding(.horizontal)
                 }
-                
+
                 Divider()
-                
+
                 // Active Disputes List
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Active Labor Disputes")
                         .font(.headline)
                         .padding(.horizontal)
-                    
+
                     if disputeManager.disputes.isEmpty {
                         Text("Loading disputes...")
                             .foregroundColor(.secondary)
@@ -73,8 +78,25 @@ struct ContentView: View {
                         }
                     }
                 }
-                
+
                 Spacer()
+            }
+            # Error banner for API errors and rate limits
+            struct ErrorBanner: View {
+                let message: String
+                var body: some View {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                        Text(message)
+                            .font(.subheadline)
+                        Spacer()
+                    }
+                    .padding()
+                    .background(Color.orange.opacity(0.1))
+                    .cornerRadius(8)
+                    .padding(.horizontal)
+                }
             }
             .navigationTitle("Online Picket Line")
             .toolbar {

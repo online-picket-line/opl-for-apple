@@ -1,48 +1,85 @@
 import Foundation
 
 /// API Client for fetching labor dispute data
-class APIClient {
-    static let shared = APIClient()
+
+enum APIError: Error, LocalizedError {
+    case invalidURL
+    case invalidResponse
+    case rateLimited(retryAfter: Int?)
+    case serverError
+    case decodingError(Error)
+    case unknownError(statusCode: Int)
     
-    // API endpoint - using GitHub raw content as a placeholder
-    // In production, this would point to the actual Online Picket Line API
-    private let baseURL = "https://raw.githubusercontent.com/online-picket-line/online-picketline/main"
-    
-    private init() {}
-    
-    /// Fetch all active labor disputes
-    func fetchDisputes() async throws -> [LaborDispute] {
-        // For now, return mock data since we can't access the actual API
-        // In production, this would make a real API call
-        
-        // Simulated API endpoint
-        let endpoint = "\(baseURL)/disputes.json"
-        
-        // Try to fetch from API, but fall back to mock data if unavailable
-        do {
-            guard let url = URL(string: endpoint) else {
-                return getMockDisputes()
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "Invalid API URL"
+        case .invalidResponse:
+            return "Invalid response from server"
+        case .rateLimited(let retryAfter):
+            if let seconds = retryAfter {
+                return "Rate limit exceeded. Please wait \(seconds) seconds."
+            } else {
+                return "Rate limit exceeded. Please try again later."
             }
-            
-            let (data, response) = try await URLSession.shared.data(from: url)
-            
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
-                // If API fails, use mock data
-                return getMockDisputes()
-            }
-            
-            let decoder = JSONDecoder()
-            let disputesResponse = try decoder.decode(DisputesResponse.self, from: data)
-            return disputesResponse.disputes
-        } catch {
-            // Fall back to mock data
-            print("Failed to fetch from API: \(error.localizedDescription)")
-            return getMockDisputes()
+        case .serverError:
+            return "Server error. Please try again later."
+        case .decodingError(let error):
+            return "Failed to decode response: \(error.localizedDescription)"
+        case .unknownError(let code):
+            return "Unknown error (status code: \(code))"
         }
     }
-    
-    /// Search for disputes affecting a specific domain
+}
+
+class APIClient {
+    static let shared = APIClient()
+
+    // Unified API endpoint for blocklist and action resources
+    private let baseURL = "https://your-instance.com/api"
+
+    private init() {}
+
+    /// Fetch all active labor disputes (from unified /api/blocklist endpoint)
+    func fetchDisputes() async throws -> [LaborDispute] {
+        let endpoint = "\(baseURL)/blocklist?format=json"
+        guard let url = URL(string: endpoint) else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("OnlinePicketLine-iOS/1.0", forHTTPHeaderField: "User-Agent")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        switch httpResponse.statusCode {
+        case 200:
+            do {
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .iso8601
+                let blocklistResponse = try decoder.decode(BlocklistAPIResponse.self, from: data)
+                // Convert blocklist entries to LaborDispute objects
+                return blocklistResponse.toLaborDisputes()
+            } catch {
+                throw APIError.decodingError(error)
+            }
+        case 429:
+            let retryAfter = httpResponse.value(forHTTPHeaderField: "Retry-After").flatMap { Int($0) }
+            throw APIError.rateLimited(retryAfter: retryAfter)
+        case 500...599:
+            throw APIError.serverError
+        default:
+            throw APIError.unknownError(statusCode: httpResponse.statusCode)
+        }
+    }
+
+    /// Search for disputes affecting a specific domain (client-side filter)
     func searchDisputesByDomain(_ domain: String) async throws -> [LaborDispute] {
         let allDisputes = try await fetchDisputes()
         return allDisputes.filter { dispute in
@@ -51,49 +88,97 @@ class APIClient {
             }
         }
     }
-    
-    /// Mock data for development and testing
-    private func getMockDisputes() -> [LaborDispute] {
-        return [
-            LaborDispute(
-                id: "1",
-                companyName: "Example Retail Corp",
-                disputeDescription: "Workers are on strike demanding better wages, healthcare benefits, and improved working conditions. The strike involves over 5,000 employees across multiple locations.",
-                affectedDomains: [
-                    "exampleretail.com",
-                    "www.exampleretail.com",
-                    "shop.exampleretail.com"
-                ],
-                sourceURL: "https://example.com/labor-news",
-                startDate: Date(timeIntervalSinceNow: -86400 * 30),
-                tags: ["strike", "retail", "wages"]
-            ),
-            LaborDispute(
-                id: "2",
-                companyName: "Tech Giant Industries",
-                disputeDescription: "Software engineers and warehouse workers are protesting unfair labor practices and union-busting activities. Multiple labor law violations have been reported.",
-                affectedDomains: [
-                    "techgiant.com",
-                    "www.techgiant.com",
-                    "careers.techgiant.com"
-                ],
-                sourceURL: "https://example.com/tech-labor-dispute",
-                startDate: Date(timeIntervalSinceNow: -86400 * 60),
-                tags: ["union-busting", "tech", "labor-violations"]
-            ),
-            LaborDispute(
-                id: "3",
-                companyName: "Fast Food Chain",
-                disputeDescription: "Restaurant workers across the chain are organizing for $15/hour minimum wage and better scheduling practices. Workers report unsafe working conditions.",
-                affectedDomains: [
-                    "fastfoodchain.com",
-                    "www.fastfoodchain.com",
-                    "order.fastfoodchain.com"
-                ],
-                sourceURL: "https://example.com/fast-food-workers",
-                startDate: Date(timeIntervalSinceNow: -86400 * 15),
-                tags: ["minimum-wage", "food-service", "safety"]
-            )
-        ]
+}
+
+// MARK: - Blocklist API Response Model
+
+struct BlocklistAPIResponse: Codable {
+    let version: String?
+    let generatedAt: String?
+    let totalUrls: Int?
+    let employers: [Employer]?
+    let blocklist: [BlocklistEntry]?
+    let actionResources: ActionResources?
+
+    struct Employer: Codable {
+        let id: String?
+        let name: String?
+        let urlCount: Int?
+    }
+
+    struct BlocklistEntry: Codable {
+        let url: String?
+        let employer: String?
+        let employerId: String?
+        let label: String?
+        let category: String?
+        let reason: String?
+    }
+
+    struct ActionResources: Codable {
+        let totalActions: Int?
+        let totalResources: Int?
+        let actions: [Action]?
+        let resources: [Resource]?
+
+        struct Action: Codable {
+            let id: String?
+            let organization: String?
+            let actionType: String?
+            let status: String?
+            let resourceCount: Int?
+        }
+
+        struct Resource: Codable {
+            let actionId: String?
+            let actionType: String?
+            let organization: String?
+            let status: String?
+            let url: String?
+            let label: String?
+            let description: String?
+            let startDate: String?
+            let endDate: String?
+            let location: String?
+        }
+    }
+
+    // Convert blocklist and action resources to [LaborDispute]
+    func toLaborDisputes() -> [LaborDispute] {
+        guard let blocklist = blocklist else { return [] }
+        // Group blocklist entries by employerId
+        let grouped = Dictionary(grouping: blocklist) { $0.employerId ?? "" }
+        var disputes: [LaborDispute] = []
+        for (employerId, entries) in grouped {
+            let employerName = entries.first?.employer ?? "Unknown"
+            let affectedDomains = entries.compactMap { entry in
+                if let urlString = entry.url, let url = URL(string: urlString) {
+                    return url.host
+                }
+                return nil
+            }
+            let disputeDescription = entries.first?.reason ?? "Labor action detected."
+            // Find a related resource for sourceURL and tags
+            let resource = actionResources?.resources?.first(where: { $0.organization == employerName })
+            let sourceURL = resource?.url
+            let startDate: Date? = {
+                if let dateString = resource?.startDate {
+                    let formatter = ISO8601DateFormatter()
+                    return formatter.date(from: dateString)
+                }
+                return nil
+            }()
+            let tags: [String]? = resource?.label.map { [$0] }
+            disputes.append(LaborDispute(
+                id: employerId,
+                companyName: employerName,
+                disputeDescription: disputeDescription,
+                affectedDomains: affectedDomains,
+                sourceURL: sourceURL,
+                startDate: startDate,
+                tags: tags
+            ))
+        }
+        return disputes
     }
 }

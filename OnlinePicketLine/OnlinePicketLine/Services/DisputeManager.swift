@@ -4,39 +4,47 @@ import Combine
 /// Manager for handling labor dispute data and caching
 class DisputeManager: ObservableObject {
     static let shared = DisputeManager()
-    
+
     @Published var disputes: [LaborDispute] = []
     @Published var lastUpdate: Date?
     @Published var isLoading = false
-    
+    @Published var errorMessage: String? = nil
+
     private let apiClient = APIClient.shared
     private let cacheKey = "cached_disputes"
     private let lastUpdateKey = "last_update_date"
-    
+
     private init() {
         loadFromCache()
     }
-    
+
     /// Fetch disputes from API
     func fetchDisputes() async {
         await MainActor.run {
             isLoading = true
+            errorMessage = nil
         }
-        
+
         do {
             let fetchedDisputes = try await apiClient.fetchDisputes()
-            
             await MainActor.run {
                 self.disputes = fetchedDisputes
                 self.lastUpdate = Date()
                 self.isLoading = false
                 self.saveToCache()
             }
-        } catch {
-            print("Error fetching disputes: \(error.localizedDescription)")
+        } catch let error as APIError {
             await MainActor.run {
+                self.errorMessage = error.errorDescription
                 self.isLoading = false
             }
+            print("API Error: \(error.errorDescription ?? "Unknown")")
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Failed to fetch disputes"
+                self.isLoading = false
+            }
+            print("Error fetching disputes: \(error.localizedDescription)")
         }
     }
     
