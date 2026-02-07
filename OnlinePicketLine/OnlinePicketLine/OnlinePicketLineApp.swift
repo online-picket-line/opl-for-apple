@@ -2,21 +2,25 @@ import SwiftUI
 
 @main
 struct OnlinePicketLineApp: App {
-    @StateObject private var disputeManager = DisputeManager.shared
-    @StateObject private var networkMonitor = NetworkMonitor.shared
+    @StateObject private var appState = AppState.shared
+    @StateObject private var locationManager = LocationManager.shared
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(disputeManager)
-                .environmentObject(networkMonitor)
-                .onAppear {
-                    // Start monitoring and fetch initial data
-                    Task {
-                        await disputeManager.fetchDisputes()
-                        networkMonitor.startMonitoring()
+            if appState.hasApiKey {
+                MainTabView()
+                    .environmentObject(appState)
+                    .environmentObject(locationManager)
+                    .onAppear {
+                        Task {
+                            await appState.refreshData()
+                            locationManager.startMonitoring()
+                        }
                     }
-                }
+            } else {
+                ApiKeySetupView()
+                    .environmentObject(appState)
+            }
         }
     }
 }

@@ -1,20 +1,33 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to the Online Picket Line iOS app will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This project follows [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.0.0] - 2025-01-01
 
 ### Added
-- Initial project scaffolding
-- Network Extension-based traffic filtering architecture
-- GPS geofencing with strike proximity notifications via Core Location
-- GPS snapshot submission for augmenting strike data
-- Strike submission from mobile app
-- Geocoding and reverse-geocoding support
-- Hash-based API caching for efficient data sync
-- 100-mile radius regional data fetching
-- CI/CD pipeline with GitHub Actions
-- App Store submission documentation
+- Complete native iOS app with SwiftUI interface
+- GPS proximity alerts for active picket lines within configurable radius (default 100 miles)
+- GPS Snapshot feature for submitting location data to augment strike information
+- Strike submission wizard for reporting new labor actions
+- Dashboard with active strike statistics and nearby geofence cards
+- Solidarity alert view for blocked employer domains
+- Settings view with notification radius slider, GPS toggle, and API key management
+- API key setup flow with validation on first launch
+- Keychain-based secure storage for API credentials
+- Hash-based caching (SHA-256) with HTTP 304 support for efficient data sync
+- Geocoding and reverse geocoding via OPL Mobile API
+- Tab-based navigation (Dashboard, GPS Snapshot, Report Strike, Settings)
+- Unit tests for models, blocklist matching, API client, and distance calculations
+- CI/CD workflow with lint (SwiftLint), test, security (CodeQL), build, and release jobs
+- App Store submission guide with Network Extension entitlement instructions
+
+### Technical Details
+- Swift 5.0, iOS 16.0+ deployment target
+- SwiftUI with Combine for reactive state management
+- URLSession with async/await for networking
+- CoreLocation for GPS monitoring and proximity alerts
+- UserNotifications for strike proximity notifications
+- Security framework (Keychain) for API key storage
+- Bundle ID: com.onlinepicketline.opl

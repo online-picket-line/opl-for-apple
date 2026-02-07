@@ -1,170 +1,134 @@
-# Online Picket Line for Apple iOS
+# Online Picket Line for iOS
 
-An iOS application that helps users support workers' rights by alerting them when they're about to access a company involved in a labor dispute.
-
-## Overview
-
-This application monitors outgoing traffic and checks against the [Online Picket Line API](https://github.com/online-picket-line/online-picketline) to inform users when they're accessing a company currently under a labor dispute. When a match is found, the user is presented with information about the dispute and can choose to respect the picket line or proceed anyway.
+Native iOS application that helps workers stand in solidarity with active labor disputes. The app provides GPS-based proximity alerts for nearby picket lines, allows users to submit strike reports and GPS location snapshots, and alerts users when accessing employers with active disputes.
 
 ## Features
 
-- 🛡️ **Traffic Monitoring**: Monitors network requests to detect access to companies in labor disputes
-- 📋 **Labor Dispute Database**: Fetches and caches current labor disputes from the Online Picket Line API
-- ⚠️ **User Alerts**: Displays detailed information about labor disputes when detected
-- 🎯 **User Choice**: Allows users to choose whether to block or proceed with the connection
-- 📊 **Statistics**: Tracks blocked sites and active disputes
-- 🔄 **Offline Support**: Caches dispute data for offline access
-- ⚙️ **Settings**: Configurable monitoring and notification preferences
+- **Solidarity Alerts**: Notifies users when accessing employers with active labor disputes via in-app blocklist checking
+- **GPS Strike Proximity Alerts**: Monitors your location and alerts you when within a configurable radius of an active picket line (default 100 miles)
+- **GPS Snapshot**: Submit your GPS coordinates to augment strike location data
+- **Strike Submission**: Report new labor actions through a built-in submission wizard
+- **Hash-Based Caching**: Efficient data syncing using SHA-256 content hashes and HTTP 304 responses
+- **Secure API Key Storage**: Keychain-based storage for API credentials
 
-## Architecture
+## Requirements
 
-The application is built using SwiftUI and follows the MVVM pattern:
+- iOS 16.0 or later
+- Xcode 15.0 or later
+- Swift 5.0+
+- API key from your OPL administrator
 
-### Core Components
-
-- **OnlinePicketLineApp.swift**: Main application entry point
-- **ContentView.swift**: Main dashboard showing protection status and active disputes
-- **DisputeAlertView.swift**: Alert dialog displayed when a disputed site is detected
-- **SettingsView.swift**: Configuration and preferences
-
-### Models
-
-- **DisputeModels.swift**: Data models for labor disputes and API responses
-  - `LaborDispute`: Represents a company in a labor dispute
-  - `DisputesResponse`: API response wrapper
-  - `BlockedURLRecord`: Tracking blocked URL attempts
-
-### Services
-
-- **APIClient.swift**: Handles communication with the Online Picket Line API
-- **DisputeManager.swift**: Manages dispute data, caching, and domain matching
-- **NetworkMonitor.swift**: Monitors network activity and triggers alerts
-
-## Technical Limitations
-
-### iOS Network Interception Constraints
-
-**Important**: Due to iOS security and privacy restrictions, this application has limitations compared to traditional network filtering applications:
-
-1. **No System-Wide Traffic Interception**: iOS does not allow apps to intercept all network traffic without:
-   - Implementing a VPN connection (requires Network Extension entitlements)
-   - Using Network Extension framework with DNS filtering (requires special Apple approval)
-   - Using on-device content filtering (limited to Safari and WKWebView)
-
-2. **Current Implementation**: This version demonstrates the user interface and logic for labor dispute detection. In a production environment, you would need to:
-   - Apply for Network Extension entitlements from Apple
-   - Implement a Network Extension Provider for DNS filtering or VPN
-   - Handle complex certificate pinning and HTTPS inspection (which has privacy implications)
-   - Submit your app for App Store review with detailed privacy explanations
-
-3. **Browser Integration**: To make this work in Safari, you would need to:
-   - Create a Safari Content Blocker Extension
-   - Register URL patterns as blocking rules
-   - Update rules when the dispute database changes
-
-### Production Considerations
-
-For a production implementation, consider:
-
-1. **Network Extension**: Implement `NEFilterDataProvider` for content filtering
-2. **MDM Integration**: Deploy as a Mobile Device Management (MDM) configuration for enterprise users
-3. **Privacy Policy**: Clearly communicate what data is monitored and how it's used
-4. **API Integration**: Connect to the actual Online Picket Line API endpoint
-5. **Certificate Handling**: Properly handle SSL/TLS without compromising security
-6. **Battery Impact**: Optimize monitoring to minimize battery drain
-
-## Building and Running
+## Building
 
 ### Prerequisites
 
-- macOS with Xcode 15.0 or later
-- iOS 16.0 or later target device/simulator
-- Apple Developer account (for Network Extension entitlements in production)
+- macOS with Xcode 15+
+- Apple Developer account (for device testing)
 
-### Build Instructions
+### Build Steps
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/online-picket-line/opl-for-apple.git
-   cd opl-for-apple
-   ```
+```bash
+git clone https://github.com/oplfun/opl-for-apple.git
+cd opl-for-apple/OnlinePicketLine
 
-2. Open the project in Xcode:
-   ```bash
-   open OnlinePicketLine/OnlinePicketLine.xcodeproj
-   ```
+# Build
+xcodebuild -scheme OnlinePicketLine -configuration Debug build
 
-3. Select your target device or simulator
+# Run tests
+xcodebuild -scheme OnlinePicketLineTests -destination 'platform=iOS Simulator,name=iPhone 15' test
+```
 
-4. Build and run (⌘R)
+Or open `OnlinePicketLine.xcodeproj` in Xcode and build/run from there.
 
-### Development Mode
+## Architecture
 
-The application currently uses mock data for demonstration. To connect to a real API:
+```
+OnlinePicketLine/
+├── OnlinePicketLineApp.swift    # Entry point with API key gating
+├── Models/
+│   └── Models.swift             # All API data models (Codable)
+├── Services/
+│   ├── APIClient.swift          # URLSession-based API client with caching
+│   ├── AppState.swift           # Central ObservableObject state manager
+│   ├── LocationManager.swift    # CLLocationManager + geofence proximity
+│   └── SecureStorage.swift      # Keychain-based secure storage
+├── Views/
+│   ├── MainTabView.swift        # Tab navigation (Dashboard, GPS, Report, Settings)
+│   ├── DashboardView.swift      # Stats, nearby strikes, geofence cards
+│   ├── GpsSnapshotView.swift    # GPS snapshot submission form
+│   ├── SubmitStrikeView.swift   # Strike submission wizard
+│   ├── SettingsView.swift       # App settings and API key management
+│   ├── ApiKeySetupView.swift    # First-launch API key entry
+│   └── BlockAlertView.swift     # Solidarity alert sheet
+└── Tests/
+    ├── ModelsTests.swift        # Model serialization tests
+    ├── AppStateTests.swift      # Blocklist matching tests
+    ├── APIClientTests.swift     # URL construction + error type tests
+    └── LocationManagerTests.swift # Distance calculation tests
+```
 
-1. Update the `baseURL` in `APIClient.swift` to point to your API endpoint
-2. Ensure your API matches the expected JSON format defined in `DisputeModels.swift`
-3. Update the `Info.plist` to allow network access to your API domain
+### Key Technologies
+
+| Component | Technology |
+|-----------|-----------|
+| Language | Swift 5.0 |
+| UI Framework | SwiftUI |
+| State Management | Combine + ObservableObject |
+| Networking | URLSession (async/await) |
+| Location | CoreLocation (CLLocationManager) |
+| Notifications | UserNotifications |
+| Secure Storage | Security framework (Keychain) |
 
 ## API Integration
 
-The application expects the Online Picket Line API to return data in the following format:
+The app communicates with the OPL Mobile API using an `X-API-Key` header. Keys use the format `opl_` + 64 hex characters (68 chars total).
 
-```json
-{
-  "disputes": [
-    {
-      "id": "unique-id",
-      "company_name": "Company Name",
-      "dispute_description": "Description of the labor dispute",
-      "affected_domains": [
-        "example.com",
-        "www.example.com"
-      ],
-      "source_url": "https://source.com/article",
-      "start_date": "2024-01-01T00:00:00Z",
-      "tags": ["strike", "wages"]
-    }
-  ],
-  "last_updated": "2024-01-15T12:00:00Z"
-}
-```
+### Endpoints
+
+| Method | Endpoint | Scope | Description |
+|--------|----------|-------|-------------|
+| GET | `/api/mobile/data` | `read:mobile` | Combined blocklist + geofences |
+| GET | `/api/mobile/active-strikes` | `read:mobile` | List of active strikes |
+| POST | `/api/mobile/gps-snapshot` | `write:gps-snapshot` | Submit GPS location snapshot |
+| POST | `/api/mobile/submit-strike` | `write:submit-strike` | Submit new strike report |
+| POST | `/api/mobile/geocode` | `read:mobile` | Forward geocoding |
+| POST | `/api/mobile/reverse-geocode` | `read:mobile` | Reverse geocoding |
 
 ## Usage
 
-1. **First Launch**: The app will fetch the latest labor disputes
-2. **Enable Protection**: Toggle monitoring in Settings (enabled by default)
-3. **Browse Normally**: When you attempt to access a site involved in a labor dispute, you'll see an alert
-4. **Make Your Choice**: 
-   - "Respect the Picket Line" - Block the connection
-   - "Proceed Anyway" - Allow the connection for this session
-5. **Review Statistics**: Check the main screen for blocking statistics and active disputes
+1. **API Key Setup**: Enter your API key on first launch
+2. **Dashboard**: View active strikes nearby and blocklist statistics
+3. **GPS Snapshot**: Submit your current location to verify strike activity
+4. **Report Strike**: Submit new strike reports with location and details
+5. **Settings**: Manage notification radius, API key, and cached data
 
-## Privacy
+## Testing
 
-This application:
-- Only checks domains against the labor dispute database
-- Does not collect or transmit personal browsing data
-- Stores dispute data locally for offline access
-- Does not share data with third parties
+```bash
+# Run tests via Xcode command line
+xcodebuild test \
+  -scheme OnlinePicketLineTests \
+  -destination 'platform=iOS Simulator,name=iPhone 15'
+```
 
-## Contributing
+Tests cover:
+- Data model encoding/decoding (JSON round-trips)
+- Blocklist domain matching (exact, subdomain, case-insensitive)
+- API error types and descriptions
+- GPS distance calculations (Haversine)
 
-Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
+## iOS Platform Notes
+
+iOS does not allow system-wide traffic interception without a Network Extension entitlement (which requires special Apple approval). The current version uses an in-app blocklist approach: when the app detects a user is near or accessing a blocked employer, it shows a solidarity alert. Full DNS-level filtering is possible with the Network Extension entitlement — see [APP_STORE_SUBMISSION.md](doc/APP_STORE_SUBMISSION.md) for the entitlement request process.
+
+## Security
+
+- API keys stored in iOS Keychain (hardware-backed encryption)
+- All network traffic uses HTTPS with URLSession defaults (ATS enforced)
+- No browsing history stored or transmitted
+- Location data only used for proximity alerts and GPS snapshots
+- API key format validated before use (`opl_` prefix, 68 chars)
 
 ## License
 
-This project is open source. Please see the LICENSE file for details.
-
-## Support Workers' Rights
-
-This application is designed to help users make informed decisions about supporting companies involved in labor disputes. By using this app, you're standing in solidarity with workers fighting for fair wages, safe working conditions, and the right to organize.
-
-## Acknowledgments
-
-- Online Picket Line project for maintaining the labor dispute database
-- Workers and unions fighting for labor rights worldwide
-
-## Disclaimer
-
-This application provides information about labor disputes for educational and informational purposes. Users should verify information independently and make their own decisions about which companies to support. The developers are not responsible for the accuracy of dispute information or any consequences of using this application.
+GPL-3.0 — see [LICENSE](../opl-for-android/LICENSE)
