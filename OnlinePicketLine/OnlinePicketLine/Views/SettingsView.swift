@@ -193,7 +193,7 @@ struct AboutDetailView: View {
                     Text("Online Picket Line empowers workers and labor supporters in the digital age. When workers stand on a picket line, they're making a powerful statement. We help ensure that statement is heard everywhere — including the digital world.")
                         .foregroundColor(.secondary)
                     
-                    Text("Stand up as Labor Ally.")
+                    Text("Stand up as a Labor Ally.")
                         .fontWeight(.semibold)
                         .foregroundColor(.accentColor)
                     
