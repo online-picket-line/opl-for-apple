@@ -2,9 +2,9 @@ import XCTest
 @testable import OnlinePicketLine
 
 final class ModelsTests: XCTestCase {
-    
+
     // MARK: - GeofenceItem Decoding
-    
+
     func testGeofenceItemDecodesFromJSON() throws {
         let json = """
         {
@@ -25,7 +25,7 @@ final class ModelsTests: XCTestCase {
             "locationName": "HQ"
         }
         """.data(using: .utf8)!
-        
+
         let item = try JSONDecoder().decode(GeofenceItem.self, from: json)
         XCTAssertEqual(item.id, "geo-1")
         XCTAssertEqual(item.employerName, "Acme Corp")
@@ -37,7 +37,7 @@ final class ModelsTests: XCTestCase {
         XCTAssertNil(item.endDate)
         XCTAssertEqual(item.locationName, "HQ")
     }
-    
+
     func testGeofenceItemDecodesWithMinimalFields() throws {
         let json = """
         {
@@ -52,7 +52,7 @@ final class ModelsTests: XCTestCase {
             "notificationRadius": 200
         }
         """.data(using: .utf8)!
-        
+
         let item = try JSONDecoder().decode(GeofenceItem.self, from: json)
         XCTAssertEqual(item.id, "geo-2")
         XCTAssertNil(item.organization)
@@ -60,9 +60,9 @@ final class ModelsTests: XCTestCase {
         XCTAssertNil(item.startDate)
         XCTAssertNil(item.description)
     }
-    
+
     // MARK: - BlocklistEntry
-    
+
     func testBlocklistEntryId() throws {
         let json = """
         {
@@ -73,15 +73,15 @@ final class ModelsTests: XCTestCase {
             "actionId": "act-1"
         }
         """.data(using: .utf8)!
-        
+
         let entry = try JSONDecoder().decode(BlocklistEntry.self, from: json)
         XCTAssertEqual(entry.id, "emp-3-example.com")
         XCTAssertEqual(entry.url, "example.com")
         XCTAssertEqual(entry.employer, "Example Inc")
     }
-    
+
     // MARK: - ActiveStrike
-    
+
     func testActiveStrikeDisplayName() throws {
         let json = """
         {
@@ -94,11 +94,11 @@ final class ModelsTests: XCTestCase {
             "startDate": "2025-01-01"
         }
         """.data(using: .utf8)!
-        
+
         let strike = try JSONDecoder().decode(ActiveStrike.self, from: json)
         XCTAssertEqual(strike.displayName, "Related Companies — SEIU Local 32BJ")
     }
-    
+
     func testActiveStrikeDisplayNameWithoutOrganization() throws {
         let json = """
         {
@@ -108,13 +108,13 @@ final class ModelsTests: XCTestCase {
             "employerId": "emp-11"
         }
         """.data(using: .utf8)!
-        
+
         let strike = try JSONDecoder().decode(ActiveStrike.self, from: json)
         XCTAssertEqual(strike.displayName, "BigCorp — Boycott")
     }
-    
+
     // MARK: - GpsSnapshotRequest Encoding
-    
+
     func testGpsSnapshotRequestEncodesCorrectly() throws {
         let request = GpsSnapshotRequest(
             actionId: "act-1",
@@ -125,14 +125,14 @@ final class ModelsTests: XCTestCase {
         )
         let data = try JSONEncoder().encode(request)
         let decoded = try JSONDecoder().decode(GpsSnapshotRequest.self, from: data)
-        
+
         XCTAssertEqual(decoded.actionId, "act-1")
         XCTAssertEqual(decoded.latitude, 40.7128, accuracy: 0.0001)
         XCTAssertEqual(decoded.longitude, -74.0060, accuracy: 0.0001)
         XCTAssertEqual(decoded.address, "123 Main St")
         XCTAssertEqual(decoded.notes, "Visible picket line")
     }
-    
+
     func testGpsSnapshotRequestWithNilOptionals() throws {
         let request = GpsSnapshotRequest(
             actionId: "act-2",
@@ -146,14 +146,14 @@ final class ModelsTests: XCTestCase {
             XCTFail("Failed to deserialize JSON as dictionary")
             return
         }
-        
+
         // nil values should still be present as null or absent
         XCTAssertEqual(json["actionId"] as? String, "act-2")
         XCTAssertEqual(json["latitude"] as? Double, 34.0522, accuracy: 0.0001)
     }
-    
+
     // MARK: - StrikeSubmissionRequest Encoding
-    
+
     func testStrikeSubmissionRequestEncodesCorrectly() throws {
         let request = StrikeSubmissionRequest(
             employer: EmployerSubmission(name: "TestCo", industry: "Tech", website: "https://test.co"),
@@ -170,18 +170,18 @@ final class ModelsTests: XCTestCase {
                 coordinates: GpsCoordinates(latitude: 40.7, longitude: -74.0)
             )
         )
-        
+
         let data = try JSONEncoder().encode(request)
         let decoded = try JSONDecoder().decode(StrikeSubmissionRequest.self, from: data)
-        
+
         XCTAssertEqual(decoded.employer.name, "TestCo")
         XCTAssertEqual(decoded.action.organization, "Union Local 1")
         XCTAssertEqual(decoded.action.durationDays, 14)
         XCTAssertEqual(decoded.action.coordinates?.latitude, 40.7, accuracy: 0.1)
     }
-    
+
     // MARK: - MobileDataResponse Decoding
-    
+
     func testMobileDataResponseDecodes() throws {
         let json = """
         {
@@ -205,7 +205,7 @@ final class ModelsTests: XCTestCase {
             "generatedAt": "2025-01-01T00:00:00Z"
         }
         """.data(using: .utf8)!
-        
+
         let response = try JSONDecoder().decode(MobileDataResponse.self, from: json)
         XCTAssertEqual(response.version, "1.0")
         XCTAssertEqual(response.cachedRegion.radiusMeters, 160934)
@@ -213,9 +213,9 @@ final class ModelsTests: XCTestCase {
         XCTAssertEqual(response.blocklist.totalUrls, 0)
         XCTAssertEqual(response.suggestedRefreshInterval, 3600000)
     }
-    
+
     // MARK: - GeocodeResponse
-    
+
     func testGeocodeResponseDecodes() throws {
         let json = """
         {
@@ -230,15 +230,15 @@ final class ModelsTests: XCTestCase {
             }
         }
         """.data(using: .utf8)!
-        
+
         let response = try JSONDecoder().decode(GeocodeResponse.self, from: json)
         XCTAssertTrue(response.success)
         XCTAssertEqual(response.result?.latitude, 40.7128, accuracy: 0.0001)
         XCTAssertEqual(response.result?.displayName, "New York, NY, USA")
     }
-    
+
     // MARK: - ReverseGeocodeResult
-    
+
     func testReverseGeocodeResultDecodes() throws {
         let json = """
         {
@@ -250,16 +250,16 @@ final class ModelsTests: XCTestCase {
             "displayName": "Empire State Building, 350 Fifth Ave, New York, NY 10118"
         }
         """.data(using: .utf8)!
-        
+
         let result = try JSONDecoder().decode(ReverseGeocodeResult.self, from: json)
         XCTAssertEqual(result.address, "350 Fifth Ave")
         XCTAssertEqual(result.city, "New York")
         XCTAssertEqual(result.state, "NY")
         XCTAssertEqual(result.zipCode, "10118")
     }
-    
+
     // MARK: - BlockedRequest
-    
+
     func testBlockedRequestCreation() {
         let request = BlockedRequest(
             url: "https://example.com",

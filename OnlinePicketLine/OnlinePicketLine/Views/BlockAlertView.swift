@@ -4,9 +4,9 @@ struct BlockAlertView: View {
     let domain: String
     let employerName: String?
     let actionType: String?
-    
+
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Dark header
@@ -14,7 +14,7 @@ struct BlockAlertView: View {
                 Image(systemName: "exclamationmark.octagon.fill")
                     .font(.system(size: 48))
                     .foregroundColor(.red)
-                
+
                 Text("SOLIDARITY ALERT")
                     .font(.title2)
                     .bold()
@@ -23,7 +23,7 @@ struct BlockAlertView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 32)
             .background(Color(white: 0.12))
-            
+
             // Content
             VStack(spacing: 20) {
                 if let employer = employerName {
@@ -31,7 +31,7 @@ struct BlockAlertView: View {
                         Text(employer)
                             .font(.title3)
                             .bold()
-                        
+
                         if let action = actionType {
                             Text("Active \(action.replacingOccurrences(of: "_", with: " "))")
                                 .font(.subheadline)
@@ -40,9 +40,9 @@ struct BlockAlertView: View {
                         }
                     }
                 }
-                
+
                 Divider()
-                
+
                 VStack(spacing: 12) {
                     Label {
                         Text("This employer has an active labor dispute.")
@@ -50,14 +50,14 @@ struct BlockAlertView: View {
                         Image(systemName: "megaphone.fill")
                             .foregroundColor(.red)
                     }
-                    
+
                     Label {
                         Text("Workers are asking for solidarity by avoiding this site.")
                     } icon: {
                         Image(systemName: "hand.raised.fill")
                             .foregroundColor(.orange)
                     }
-                    
+
                     Label {
                         Text("Domain: \(domain)")
                     } icon: {
@@ -67,9 +67,9 @@ struct BlockAlertView: View {
                     .font(.caption)
                 }
                 .padding(.horizontal)
-                
+
                 Divider()
-                
+
                 // Actions
                 VStack(spacing: 12) {
                     Button(action: { dismiss() }) {
@@ -81,7 +81,7 @@ struct BlockAlertView: View {
                             .foregroundColor(.white)
                             .cornerRadius(12)
                     }
-                    
+
                     Button(action: { dismiss() }) {
                         Text("Continue Anyway")
                             .frame(maxWidth: .infinity)
@@ -94,7 +94,7 @@ struct BlockAlertView: View {
                 .padding(.horizontal)
             }
             .padding(.vertical, 24)
-            
+
             Spacer()
         }
     }

@@ -177,14 +177,14 @@ struct GeofenceItem: Codable, Identifiable {
     let moreInfoUrl: String?
     let locationName: String?
     let locationType: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case id, type, actionId, employerId, employerName, actionType
         case organization, location, coordinates, distance, notificationRadius
         case startDate, endDate, description, demands, moreInfoUrl
         case locationName, locationType
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
@@ -242,7 +242,7 @@ struct ActiveStrike: Codable, Identifiable {
     let startDate: String?
     let endDate: String?
     let description: String?
-    
+
     var displayName: String {
         "\(employerName) — \(organization ?? actionType.capitalized)"
     }
@@ -360,7 +360,7 @@ struct BlockedRequest: Identifiable {
     let timestamp: Date
     let appName: String?
     var userAction: UserAction
-    
+
     enum UserAction {
         case pending, blocked, allowed
     }
