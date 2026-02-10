@@ -190,14 +190,22 @@ struct AboutDetailView: View {
                         .font(.title2)
                         .fontWeight(.bold)
 
-                    Text("Online Picket Line empowers workers and labor supporters in the digital age. When workers stand on a picket line, they're making a powerful statement. We help ensure that statement is heard everywhere — including the digital world.")
+                    Text("""
+                        Online Picket Line empowers workers and labor supporters in the digital age. \
+                        When workers stand on a picket line, they're making a powerful statement. \
+                        We help ensure that statement is heard everywhere — including the digital world.
+                        """)
                         .foregroundColor(.secondary)
 
                     Text("Stand up as a Labor Ally.")
                         .fontWeight(.semibold)
                         .foregroundColor(.accentColor)
 
-                    Text("Every purchase is a vote, and we give you the tools to vote with your values. We believe in user-defined ethical boundaries — you decide where your digital picket line stands, and our tools help you hold it.")
+                    Text("""
+                        Every purchase is a vote, and we give you the tools to vote with your values. \
+                        We believe in user-defined ethical boundaries — you decide where your digital \
+                        picket line stands, and our tools help you hold it.
+                        """)
                         .foregroundColor(.secondary)
                 }
 
@@ -213,21 +221,31 @@ struct AboutDetailView: View {
                         icon: "lock.shield",
                         title: "Privacy",
                         subtitle: "Data Sovereignty",
-                        description: "We empower you to define your own 'secure borders' where your data cannot leave your device. All filtering decisions are made on-device — we never route your traffic through our servers."
+                        description: """
+                            We empower you to define your own 'secure borders' where your data cannot \
+                            leave your device. All filtering decisions are made on-device — we never \
+                            route your traffic through our servers.
+                            """
                     )
 
                     PillarCard(
                         icon: "shield.checkered",
                         title: "Safety",
                         subtitle: "Risk Mitigation",
-                        description: "We reduce the risk of accidental digital scabbing by automating awareness and filtering based on verified labor action data from moderated sources."
+                        description: """
+                            We reduce the risk of accidental digital scabbing by automating awareness and \
+                            filtering based on verified labor action data from moderated sources.
+                            """
                     )
 
                     PillarCard(
                         icon: "eye",
                         title: "Control",
                         subtitle: "Transparency",
-                        description: "We provide you with a clear view of which domains are associated with active disputes, so you can make informed choices — not blind ones."
+                        description: """
+                            We provide you with a clear view of which domains are associated with active \
+                            disputes, so you can make informed choices — not blind ones.
+                            """
                     )
                 }
 
@@ -239,10 +257,18 @@ struct AboutDetailView: View {
                         .font(.title2)
                         .fontWeight(.bold)
 
-                    Text("Modern economic activity doesn't just happen in web browsers. Delivery apps, gig-economy platforms, and background services all interact with employer infrastructure — often without your awareness.")
+                    Text("""
+                        Modern economic activity doesn't just happen in web browsers. Delivery apps, \
+                        gig-economy platforms, and background services all interact with employer \
+                        infrastructure — often without your awareness.
+                        """)
                         .foregroundColor(.secondary)
 
-                    Text("This app provides comprehensive, system-wide filtering that covers all network traffic on your device. Unlike browser-only solutions, we ensure that delivery apps, gig platforms, and background services also respect your ethical boundaries.")
+                    Text("""
+                        This app provides comprehensive, system-wide filtering that covers all network \
+                        traffic on your device. Unlike browser-only solutions, we ensure that delivery \
+                        apps, gig platforms, and background services also respect your ethical boundaries.
+                        """)
                         .foregroundColor(.secondary)
 
                     Text("All filtering is performed locally on your device. We do not log your browsing history, backhaul your traffic, or transmit your location data.")
@@ -293,10 +319,18 @@ struct AboutDetailView: View {
                         .font(.title2)
                         .fontWeight(.bold)
 
-                    Text("Online Picket Line is a Utah Benefit LLC — a legal structure that emphasizes mission over money. Our tools are Movement-Owned Technology, designed to provide a pro-competitive, privacy-first alternative that restores the balance between employer interests and worker rights in the digital economy.")
+                    Text("""
+                        Online Picket Line is a Utah Benefit LLC — a legal structure that emphasizes \
+                        mission over money. Our tools are Movement-Owned Technology, designed to provide \
+                        a pro-competitive, privacy-first alternative that restores the balance between \
+                        employer interests and worker rights in the digital economy.
+                        """)
                         .foregroundColor(.secondary)
 
-                    Text("We are funded by donations and grants from labor-friendly organizations, ensuring we remain independent and focused on serving workers.")
+                    Text("""
+                        We are funded by donations and grants from labor-friendly organizations, ensuring \
+                        we remain independent and focused on serving workers.
+                        """)
                         .foregroundColor(.secondary)
                 }
 
