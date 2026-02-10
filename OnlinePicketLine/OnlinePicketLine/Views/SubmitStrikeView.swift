@@ -3,7 +3,7 @@ import SwiftUI
 struct SubmitStrikeView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var locationManager: LocationManager
-    
+
     @State private var employerName = ""
     @State private var unionName = ""
     @State private var actionType = "strike"
@@ -21,9 +21,9 @@ struct SubmitStrikeView: View {
     @State private var isLoading = false
     @State private var showSuccess = false
     @State private var errorMessage: String?
-    
+
     private let actionTypes = ["strike", "lockout", "picket", "boycott", "work_stoppage", "other"]
-    
+
     var body: some View {
         NavigationView {
             Form {
@@ -37,13 +37,13 @@ struct SubmitStrikeView: View {
                         }
                     }
                 }
-                
+
                 // Description
                 Section("Description *") {
                     TextField("Describe the labor action...", text: $description, axis: .vertical)
                         .lineLimit(3...8)
                 }
-                
+
                 // Timing
                 Section("Timing") {
                     DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
@@ -56,7 +56,7 @@ struct SubmitStrikeView: View {
                             .multilineTextAlignment(.trailing)
                     }
                 }
-                
+
                 // Location
                 Section("Location") {
                     TextField("Street Address", text: $address)
@@ -67,14 +67,14 @@ struct SubmitStrikeView: View {
                     }
                     TextField("ZIP Code", text: $zipCode)
                         .keyboardType(.numberPad)
-                    
+
                     Button(action: useCurrentLocation) {
                         HStack {
                             Image(systemName: "location.fill")
                             Text("Use Current Location")
                         }
                     }
-                    
+
                     Button(action: geocodeEnteredAddress) {
                         HStack {
                             Image(systemName: "map")
@@ -82,7 +82,7 @@ struct SubmitStrikeView: View {
                         }
                     }
                     .disabled(address.isEmpty && city.isEmpty)
-                    
+
                     if !latitude.isEmpty && !longitude.isEmpty {
                         HStack {
                             Text("Coordinates:")
@@ -95,7 +95,7 @@ struct SubmitStrikeView: View {
                         }
                     }
                 }
-                
+
                 // Source & Contact
                 Section("Source (optional)") {
                     TextField("News/Source URL", text: $sourceUrl)
@@ -105,7 +105,7 @@ struct SubmitStrikeView: View {
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
                 }
-                
+
                 // Error
                 if let error = errorMessage {
                     Section {
@@ -113,7 +113,7 @@ struct SubmitStrikeView: View {
                             .foregroundColor(.red)
                     }
                 }
-                
+
                 // Submit
                 Section {
                     Button(action: submitStrike) {
@@ -141,15 +141,15 @@ struct SubmitStrikeView: View {
             }
         }
     }
-    
+
     // MARK: - Validation
-    
+
     private var isFormValid: Bool {
         !employerName.isEmpty && !unionName.isEmpty && !description.isEmpty
     }
-    
+
     // MARK: - Actions
-    
+
     private func useCurrentLocation() {
         if let location = locationManager.lastLocation {
             latitude = String(location.coordinate.latitude)
@@ -173,15 +173,15 @@ struct SubmitStrikeView: View {
             errorMessage = "Location not available. Please enable location services."
         }
     }
-    
+
     private func geocodeEnteredAddress() {
         let fullAddress = [address, city, state, zipCode]
             .filter { !$0.isEmpty }
             .joined(separator: ", ")
-        
+
         guard !fullAddress.isEmpty else { return }
         isLoading = true
-        
+
         Task {
             do {
                 let result = try await APIClient.shared.geocode(address: fullAddress)
@@ -193,19 +193,19 @@ struct SubmitStrikeView: View {
             isLoading = false
         }
     }
-    
+
     private func submitStrike() {
         isLoading = true
         errorMessage = nil
-        
+
         let locationParts = [address, city, state, zipCode].filter { !$0.isEmpty }
         let locationString = locationParts.isEmpty ? "Unknown" : locationParts.joined(separator: ", ")
-        
+
         var coords: GpsCoordinates? = nil
         if let lat = Double(latitude), let lng = Double(longitude) {
             coords = GpsCoordinates(latitude: lat, longitude: lng)
         }
-        
+
         let request = StrikeSubmissionRequest(
             employer: EmployerSubmission(
                 name: employerName,
@@ -225,7 +225,7 @@ struct SubmitStrikeView: View {
                 coordinates: coords
             )
         )
-        
+
         Task {
             do {
                 _ = try await APIClient.shared.submitStrike(request)
@@ -236,7 +236,7 @@ struct SubmitStrikeView: View {
             isLoading = false
         }
     }
-    
+
     private func resetForm() {
         employerName = ""
         unionName = ""

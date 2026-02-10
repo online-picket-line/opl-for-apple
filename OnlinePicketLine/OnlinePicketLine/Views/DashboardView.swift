@@ -5,7 +5,7 @@ struct DashboardView: View {
     @EnvironmentObject var locationManager: LocationManager
     @State private var showingBlockAlert = false
     @State private var selectedEntry: BlocklistEntry?
-    
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -24,16 +24,16 @@ struct DashboardView: View {
                         .background(Color.orange.opacity(0.15))
                         .cornerRadius(8)
                     }
-                    
+
                     // Status Card
                     VStack(spacing: 12) {
                         Image(systemName: "shield.checkered")
                             .font(.system(size: 50))
                             .foregroundColor(.green)
-                        
+
                         Text("Protection Active")
                             .font(.title2).bold()
-                        
+
                         Text("Monitoring traffic and GPS proximity")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
@@ -43,7 +43,7 @@ struct DashboardView: View {
                     .background(Color(.systemBackground))
                     .cornerRadius(16)
                     .shadow(radius: 2)
-                    
+
                     // Stats Row
                     HStack(spacing: 12) {
                         StatCard(
@@ -65,13 +65,13 @@ struct DashboardView: View {
                             color: .orange
                         )
                     }
-                    
+
                     // Nearby Strikes
                     if let geofences = appState.mobileData?.geofences.all, !geofences.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Nearby Strikes")
                                 .font(.headline)
-                            
+
                             ForEach(geofences) { geofence in
                                 GeofenceCard(geofence: geofence)
                             }
@@ -112,7 +112,7 @@ struct StatCard: View {
     let value: String
     let icon: String
     let color: Color
-    
+
     var body: some View {
         VStack(spacing: 6) {
             Image(systemName: icon)
@@ -133,7 +133,7 @@ struct StatCard: View {
 
 struct GeofenceCard: View {
     let geofence: GeofenceItem
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
@@ -147,17 +147,17 @@ struct GeofenceCard: View {
                     .foregroundColor(.red)
                     .cornerRadius(8)
             }
-            
+
             if let location = geofence.location {
                 Text(location)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            
+
             Text(formatDistance(geofence.distance))
                 .font(.subheadline).bold()
                 .foregroundColor(.orange)
-            
+
             if let desc = geofence.description, !desc.isEmpty {
                 Text(desc)
                     .font(.caption)
@@ -169,7 +169,7 @@ struct GeofenceCard: View {
         .cornerRadius(12)
         .shadow(radius: 1)
     }
-    
+
     private func formatDistance(_ meters: Int) -> String {
         if meters < 1000 {
             return "\(meters) m away"

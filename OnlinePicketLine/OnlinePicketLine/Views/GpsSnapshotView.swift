@@ -4,7 +4,7 @@ import CoreLocation
 struct GpsSnapshotView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var locationManager: LocationManager
-    
+
     @State private var activeStrikes: [ActiveStrike] = []
     @State private var selectedStrikeIndex = 0
     @State private var latitude = ""
@@ -15,7 +15,7 @@ struct GpsSnapshotView: View {
     @State private var isLoading = false
     @State private var showSuccess = false
     @State private var errorMessage: String?
-    
+
     var body: some View {
         NavigationView {
             Form {
@@ -32,7 +32,7 @@ struct GpsSnapshotView: View {
                         }
                     }
                 }
-                
+
                 // Location Capture
                 Section("Location") {
                     Button(action: captureCurrentLocation) {
@@ -41,14 +41,14 @@ struct GpsSnapshotView: View {
                             Text("Use Current Location")
                         }
                     }
-                    
+
                     HStack {
                         TextField("Latitude", text: $latitude)
                             .keyboardType(.numbersAndPunctuation)
                         TextField("Longitude", text: $longitude)
                             .keyboardType(.numbersAndPunctuation)
                     }
-                    
+
                     HStack {
                         Button("Look Up") {
                             guard let lat = Double(latitude), let lng = Double(longitude) else { return }
@@ -57,30 +57,30 @@ struct GpsSnapshotView: View {
                         .disabled(latitude.isEmpty || longitude.isEmpty)
                     }
                 }
-                
+
                 // Address Lookup
                 Section("Address Lookup") {
                     TextField("Street, City, State ZIP", text: $address)
-                    
+
                     Button("Geocode Address") {
                         guard !address.isEmpty else { return }
                         Task { await geocodeAddress() }
                     }
                     .disabled(address.isEmpty)
-                    
+
                     if !resolvedAddress.isEmpty {
                         Text(resolvedAddress)
                             .font(.caption)
                             .foregroundColor(.green)
                     }
                 }
-                
+
                 // Notes
                 Section("Notes (optional)") {
                     TextField("Additional context about this location", text: $notes, axis: .vertical)
                         .lineLimit(3...6)
                 }
-                
+
                 // Error
                 if let error = errorMessage {
                     Section {
@@ -88,7 +88,7 @@ struct GpsSnapshotView: View {
                             .foregroundColor(.red)
                     }
                 }
-                
+
                 // Submit
                 Section {
                     Button(action: submitSnapshot) {
@@ -115,9 +115,9 @@ struct GpsSnapshotView: View {
             .onAppear { Task { await loadStrikes() } }
         }
     }
-    
+
     // MARK: - Actions
-    
+
     private func loadStrikes() async {
         isLoading = true
         do {
@@ -127,7 +127,7 @@ struct GpsSnapshotView: View {
         }
         isLoading = false
     }
-    
+
     private func captureCurrentLocation() {
         if let location = locationManager.lastLocation {
             latitude = String(location.coordinate.latitude)
@@ -140,7 +140,7 @@ struct GpsSnapshotView: View {
             errorMessage = "Location not available. Please enable location services."
         }
     }
-    
+
     private func geocodeAddress() async {
         isLoading = true
         errorMessage = nil
@@ -154,7 +154,7 @@ struct GpsSnapshotView: View {
         }
         isLoading = false
     }
-    
+
     private func reverseGeocode(lat: Double, lng: Double) async {
         do {
             let result = try await APIClient.shared.reverseGeocode(latitude: lat, longitude: lng)
@@ -167,15 +167,15 @@ struct GpsSnapshotView: View {
             // Non-critical
         }
     }
-    
+
     private func submitSnapshot() {
         guard let lat = Double(latitude), let lng = Double(longitude),
               selectedStrikeIndex < activeStrikes.count else { return }
-        
+
         let strike = activeStrikes[selectedStrikeIndex]
         isLoading = true
         errorMessage = nil
-        
+
         Task {
             do {
                 _ = try await APIClient.shared.submitGpsSnapshot(

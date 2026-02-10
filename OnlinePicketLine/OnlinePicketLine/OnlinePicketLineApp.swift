@@ -4,7 +4,7 @@ import SwiftUI
 struct OnlinePicketLineApp: App {
     @StateObject private var appState = AppState.shared
     @StateObject private var locationManager = LocationManager.shared
-    
+
     var body: some Scene {
         WindowGroup {
             if appState.hasApiKey {
