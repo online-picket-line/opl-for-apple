@@ -142,7 +142,10 @@ final class ModelsTests: XCTestCase {
             notes: nil
         )
         let data = try JSONEncoder().encode(request)
-        let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            XCTFail("Failed to deserialize JSON as dictionary")
+            return
+        }
         
         // nil values should still be present as null or absent
         XCTAssertEqual(json["actionId"] as? String, "act-2")
