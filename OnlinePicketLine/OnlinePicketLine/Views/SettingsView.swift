@@ -197,7 +197,7 @@ struct AboutDetailView: View {
                         """)
                         .foregroundColor(.secondary)
 
-                    Text("Stand up as a Labor Ally.")
+                    Text("Digital Solidarity Tools.")
                         .fontWeight(.semibold)
                         .foregroundColor(.accentColor)
 
